@@ -197,3 +197,10 @@ prompt e as imagens enviados como mensagem do usuário. O app lê o stream em te
 ## Autor
 
 **Carlos Danyel Silva Teixeira**, criador e desenvolvedor do NotchClaude.
+
+---
+
+## Licença
+
+Distribuído sob a licença **MIT**. Veja o arquivo [`LICENSE`](LICENSE).
+Você pode usar, modificar e redistribuir o NotchClaude livremente, desde que mantenha o aviso de copyright.
