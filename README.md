@@ -84,6 +84,8 @@ make install   # copia para /Applications e abre
 ### Notch
 - **Passe o mouse** no notch para abrir. Ao tirar o mouse, ele fecha (com feedback tátil, igual ao NotchNook).
 - **Tarefas**: à esquerda, o que está rodando agora (ou o limite, ou a próxima tarefa); à direita, a lista com status.
+  Passe o mouse numa tarefa para **rodar**, **copiar o prompt** (o primeiro prompt da tarefa, para reaproveitar
+  em outra), **acompanhar** ou **excluir**.
 - **Nova**: cria uma tarefa.
 - **Mídia**: player do Spotify e espelho da câmera (veja abaixo).
 - No topo à direita ficam o uso do **limite de 5h** e do **limite semanal** em %, sempre da conta logada no

@@ -93,6 +93,7 @@ struct TaskRow: View {
     @EnvironmentObject private var container: AppContainer
     @EnvironmentObject private var runs: RunManager
     @State private var hovering = false
+    @State private var copied = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -166,6 +167,13 @@ struct TaskRow: View {
                     if task.status.isFinished { container.scheduler.retry(task.id) } else { container.scheduler.runNow(task.id) }
                 }
             }
+            NotchIconButton(
+                symbol: copied ? "checkmark" : "doc.on.doc.fill",
+                help: copied ? "Prompt copiado" : "Copiar prompt",
+                tint: copied ? Theme.success : Theme.primaryText,
+                size: 24,
+                action: copyPrompt
+            )
             NotchIconButton(symbol: "eye.fill", help: "Acompanhar", size: 24) {
                 controller.showMonitor(task.id)
             }
@@ -189,6 +197,7 @@ struct TaskRow: View {
             Button("Parar") { container.scheduler.cancel(task.id) }
         }
         Divider()
+        Button("Copiar prompt") { copyPrompt() }
         Button("Duplicar") { container.duplicate(task.id) }
         Button("Mostrar pasta no Finder") { TerminalLauncher.revealDirectory(task.directory) }
         if task.lastSessionId != nil {
@@ -198,6 +207,14 @@ struct TaskRow: View {
         }
         Divider()
         Button("Excluir", role: .destructive) { container.delete(task.id) }
+    }
+
+    private func copyPrompt() {
+        Clipboard.copy(task.prompt)
+        withAnimation(.easeOut(duration: 0.12)) { copied = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+            withAnimation(.easeOut(duration: 0.12)) { copied = false }
+        }
     }
 }
 

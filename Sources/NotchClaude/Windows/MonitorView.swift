@@ -171,8 +171,7 @@ struct MonitorHeader: View {
                 if task.totalCost > 0 { meta("dollarsign.circle", Formatters.cost(task.totalCost)) }
                 if let session = task.lastSessionId {
                     Button {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(session, forType: .string)
+                        Clipboard.copy(session)
                     } label: {
                         Label(String(session.prefix(8)), systemImage: "doc.on.doc")
                     }
