@@ -1,6 +1,8 @@
-MIT License
+MIT License (with Attribution)
 
 Copyright (c) 2026 Carlos Danyel Silva Teixeira
+Creator: Carlos Danyel Silva Teixeira (https://www.linkedin.com/feed/)
+Original project: https://github.com/CarlosDanyel/NotchClaude
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -11,6 +13,13 @@ furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+
+Attribution: any use, copy, fork, modification or redistribution of the
+Software, in whole or in part, including its app icon, must give clear and
+visible credit to the original creator, Carlos Danyel Silva Teixeira
+(https://www.linkedin.com/feed/), with a link to the original project
+(https://github.com/CarlosDanyel/NotchClaude), for example in the README, the
+"About" screen or the documentation of the derived work.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

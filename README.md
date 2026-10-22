@@ -1,6 +1,12 @@
-# NotchClaude
+<p align="center">
+  <img src="assets/icon.png" alt="Ícone do NotchClaude" width="160">
+</p>
 
-**Criado e desenvolvido por Carlos Danyel Silva Teixeira.**
+<h1 align="center">NotchClaude</h1>
+
+<p align="center">
+  Criado e desenvolvido por <b>Carlos Danyel Silva Teixeira</b> · <a href="https://www.linkedin.com/feed/">LinkedIn</a>
+</p>
 
 Agendador de tarefas do **Claude Code** que mora no notch do Mac, no estilo do NotchNook.
 Você passa o mouse no notch, ele abre, você escolhe a pasta, escreve o prompt, anexa imagens e agenda.
@@ -216,11 +222,20 @@ prompt e as imagens enviados como mensagem do usuário. O app lê o stream em te
 
 ## Autor
 
-**Carlos Danyel Silva Teixeira**, criador e desenvolvedor do NotchClaude.
+**Carlos Danyel Silva Teixeira**, criador e desenvolvedor do NotchClaude (código e ícone).
+
+- LinkedIn: [Carlos Danyel Silva Teixeira](https://www.linkedin.com/feed/)
+- GitHub: [@CarlosDanyel](https://github.com/CarlosDanyel)
 
 ---
 
 ## Licença
 
-Distribuído sob a licença **MIT**. Veja o arquivo [`LICENSE`](LICENSE).
-Você pode usar, modificar e redistribuir o NotchClaude livremente, desde que mantenha o aviso de copyright.
+Distribuído sob a licença **MIT com cláusula de atribuição**. Veja o arquivo [`LICENSE`](LICENSE).
+Você pode usar, modificar e redistribuir o NotchClaude livremente, desde que:
+
+- mantenha o aviso de copyright e o texto da licença;
+- dê **crédito visível ao criador, Carlos Danyel Silva Teixeira** ([LinkedIn](https://www.linkedin.com/feed/)), com link para o
+  projeto original (https://github.com/CarlosDanyel/NotchClaude), por exemplo no README, na tela "Sobre" ou na documentação.
+
+Isso vale também para o ícone do app ([`assets/icon.png`](assets/icon.png)).
