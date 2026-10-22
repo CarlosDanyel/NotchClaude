@@ -12,6 +12,7 @@ enum Theme {
     static let warning = Color(red: 0.98, green: 0.76, blue: 0.33)
     static let danger = Color(red: 1.0, green: 0.42, blue: 0.42)
     static let info = Color(red: 0.45, green: 0.66, blue: 1.0)
+    static let spotify = Color(red: 0.12, green: 0.84, blue: 0.38)
 
     static let openSpring = Animation.spring(response: 0.42, dampingFraction: 0.78)
     static let closeSpring = Animation.spring(response: 0.36, dampingFraction: 0.9)
@@ -39,6 +40,29 @@ extension TaskStatus {
         case .completed: return "checkmark.circle.fill"
         case .failed: return "exclamationmark.octagon.fill"
         case .cancelled: return "stop.circle"
+        }
+    }
+}
+
+extension NotchStatus {
+    var color: Color {
+        switch self {
+        case .running: return Theme.success
+        case .queued: return Theme.warning
+        case .limited, .failed: return Theme.danger
+        case .scheduled: return Theme.info
+        case .idle: return Theme.tertiaryText
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .running: return "Executando"
+        case .queued: return "Na fila"
+        case .limited: return "Tokens esgotados"
+        case .failed: return "Uma tarefa falhou"
+        case .scheduled: return "Tarefas agendadas"
+        case .idle: return "Nada pendente"
         }
     }
 }

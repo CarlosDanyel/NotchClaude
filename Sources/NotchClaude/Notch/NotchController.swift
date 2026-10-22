@@ -19,6 +19,7 @@ final class NotchController {
     private var dragChangeCount = NSPasteboard(name: .drag).changeCount
     private var modalDepth = 0
     private var sticky = false
+    private var acknowledgedAt = Date()
 
     private static let panelSize = CGSize(width: 780, height: 480)
 
@@ -35,6 +36,8 @@ final class NotchController {
             .environmentObject(container.runs)
             .environmentObject(container.settings)
             .environmentObject(container.composer)
+            .environmentObject(container.spotify)
+            .environmentObject(container.mirror)
         let hosting = NSHostingView(rootView: root)
         hosting.frame = NSRect(origin: .zero, size: Self.panelSize)
         hosting.autoresizingMask = [.width, .height]
@@ -65,12 +68,16 @@ final class NotchController {
             model.phase = .open
         }
         panel?.ignoresMouseEvents = false
+        acknowledgedAt = Date()
+        refreshActivity()
+        container.usageMonitor.refreshIfStale()
     }
 
     func close() {
         cancelPending()
         sticky = false
         guard model.isOpen else { return }
+        container.mirror.stop()
         withAnimation(Theme.closeSpring) {
             model.phase = .closed
             model.isDraggingFiles = false
@@ -258,9 +265,50 @@ final class NotchController {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.layout() }
             .store(in: &cancellables)
+
+        let settings = container.settings
+        let spotify = container.spotify
+        settings.$showClaudeStatus
+            .receive(on: RunLoop.main)
+            .sink { [weak self] value in
+                guard let self, value != self.model.showsStatus else { return }
+                withAnimation(Theme.openSpring) { self.model.showsStatus = value }
+            }
+            .store(in: &cancellables)
+
+        settings.$spotifyEnabled
+            .receive(on: RunLoop.main)
+            .sink { spotify.setEnabled($0) }
+            .store(in: &cancellables)
+
+        Publishers.CombineLatest3(settings.$spotifyEnabled, settings.$showMusicInNotch, spotify.$track)
+            .map { $0 && $1 && $2 != nil }
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] value in
+                guard let self, value != self.model.showsMusic else { return }
+                withAnimation(Theme.openSpring) { self.model.showsMusic = value }
+            }
+            .store(in: &cancellables)
+
+        Publishers.CombineLatest3(settings.$spotifyEnabled, settings.$mirrorEnabled, model.$page)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] spotifyEnabled, mirrorEnabled, page in
+                guard let self else { return }
+                if page != .media || !mirrorEnabled { self.container.mirror.stop() }
+                if page == .media, !spotifyEnabled, !mirrorEnabled { self.model.page = .tasks }
+            }
+            .store(in: &cancellables)
+    }
+
+    private func refreshActivity() {
+        updateLiveActivity(tasks: container.store.tasks, limit: container.store.limit, sessions: container.runs.sessions)
     }
 
     private func updateLiveActivity(tasks: [ClaudeTask], limit: LimitState, sessions: [UUID: RunSession]) {
+        let status = NotchStatus.resolve(tasks: tasks, limit: limit, running: sessions.count, acknowledgedAt: acknowledgedAt)
+        if status != model.status { model.status = status }
+
         let activity: LiveActivity?
         if let session = sessions.values.min(by: { $0.startedAt < $1.startedAt }) {
             let title = tasks.first { $0.id == session.taskId }?.title ?? "Claude"
@@ -286,7 +334,7 @@ final class NotchController {
         switch event.type {
         case .leftMouseDown, .rightMouseDown:
             dragChangeCount = NSPasteboard(name: .drag).changeCount
-            if !local, model.isOpen, modalDepth == 0, !visibleRect.contains(NSEvent.mouseLocation) {
+            if !local, model.isOpen, modalDepth == 0, container.mirror.state != .starting, !visibleRect.contains(NSEvent.mouseLocation) {
                 close()
             }
         case .leftMouseDragged:
@@ -326,7 +374,7 @@ final class NotchController {
     }
 
     private var shouldStayOpen: Bool {
-        if modalDepth > 0 || model.isDraggingFiles { return true }
+        if modalDepth > 0 || model.isDraggingFiles || container.mirror.state == .starting { return true }
         if container.settings.preventCloseWhileTyping, model.page == .compose, panel?.isKeyWindow == true { return true }
         return false
     }

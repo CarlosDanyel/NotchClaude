@@ -39,6 +39,10 @@
     <string>14.0</string>
     <key>LSUIElement</key>
     <true/>
+    <key>NSCameraUsageDescription</key>
+    <string>O NotchClaude usa a câmera só para o espelho do notch. Nada é gravado.</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>O NotchClaude controla o Spotify para mostrar a música tocando e tocar, pausar e pular faixas pelo notch.</string>
     <key>NSHumanReadableCopyright</key>
     <string>© 2026 Carlos Danyel Silva Teixeira</string>
     <key>NSHighResolutionCapable</key>

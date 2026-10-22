@@ -27,6 +27,24 @@ enum LiveActivity: Equatable {
     case limited(until: Date, kind: String)
 }
 
+enum NotchStatus: Equatable {
+    case idle
+    case scheduled
+    case queued
+    case running
+    case limited
+    case failed
+
+    static func resolve(tasks: [ClaudeTask], limit: LimitState, running: Int, acknowledgedAt: Date, now: Date = Date()) -> NotchStatus {
+        if running > 0 { return .running }
+        if limit.isBlocked(at: now) || tasks.contains(where: { $0.status == .rateLimited }) { return .limited }
+        if tasks.contains(where: { $0.status == .failed && ($0.finishedAt ?? .distantPast) > acknowledgedAt }) { return .failed }
+        if tasks.contains(where: { $0.status == .queued }) { return .queued }
+        if tasks.contains(where: { $0.status == .scheduled }) { return .scheduled }
+        return .idle
+    }
+}
+
 struct NotchPeek: Equatable, Identifiable {
     let id = UUID()
     var symbol: String
@@ -45,6 +63,7 @@ final class NotchViewModel: ObservableObject {
     enum Page {
         case tasks
         case compose
+        case media
     }
 
     @Published var phase: Phase = .closed
@@ -55,6 +74,9 @@ final class NotchViewModel: ObservableObject {
     @Published var isDraggingFiles = false
     @Published var isDropTargeted = false
     @Published var hovering = false
+    @Published var status: NotchStatus = .idle
+    @Published var showsStatus = false
+    @Published var showsMusic = false
 
     static let openWidth: CGFloat = 700
     static let contentPadding: CGFloat = 15
@@ -68,10 +90,16 @@ final class NotchViewModel: ObservableObject {
         return peek == nil ? 11 : 20
     }
 
-    var wingWidth: CGFloat { geometry.notchSize.height + 6 }
+    var wingWidth: CGFloat { geometry.notchSize.height + 10 }
+
+    var hasWings: Bool { liveActivity != nil || peek != nil || showsStatus || showsMusic }
 
     func openHeight(for page: Page) -> CGFloat {
-        page == .compose ? 418 : 318
+        switch page {
+        case .tasks: return 318
+        case .compose: return 418
+        case .media: return 280
+        }
     }
 
     var shapeSize: CGSize {
@@ -81,7 +109,7 @@ final class NotchViewModel: ObservableObject {
         }
         var width = notch.width + topRadius * 2
         var height = notch.height
-        if liveActivity != nil || peek != nil { width += wingWidth * 2 }
+        if hasWings { width += wingWidth * 2 }
         if peek != nil {
             width = max(width + 40, 400)
             height += 40
@@ -91,6 +119,6 @@ final class NotchViewModel: ObservableObject {
     }
 
     var isShapeVisible: Bool {
-        isOpen || geometry.hasNotch || liveActivity != nil || peek != nil || hovering
+        isOpen || geometry.hasNotch || hasWings || hovering
     }
 }

@@ -4,12 +4,16 @@ struct NotchHeaderView: View {
     @ObservedObject var model: NotchViewModel
     let controller: NotchController
     @EnvironmentObject private var store: TaskStore
+    @EnvironmentObject private var settings: AppSettings
 
     var body: some View {
         HStack(spacing: 8) {
             HStack(spacing: 2) {
                 tab(.tasks, symbol: "list.bullet.rectangle.portrait.fill", title: "Tarefas")
                 tab(.compose, symbol: "plus.bubble.fill", title: "Nova")
+                if settings.spotifyEnabled || settings.mirrorEnabled {
+                    tab(.media, symbol: "music.note", title: "Mídia")
+                }
             }
             .padding(2)
             .background(Capsule().fill(Theme.card))

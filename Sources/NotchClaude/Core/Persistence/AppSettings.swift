@@ -38,6 +38,10 @@ final class AppSettings: ObservableObject {
     @Published var showOnNonNotchScreens: Bool { didSet { defaults.set(showOnNonNotchScreens, forKey: Key.showOnNonNotchScreens) } }
     @Published var preventCloseWhileTyping: Bool { didSet { defaults.set(preventCloseWhileTyping, forKey: Key.preventCloseWhileTyping) } }
     @Published var recentDirectories: [String] { didSet { defaults.set(recentDirectories, forKey: Key.recentDirectories) } }
+    @Published var showClaudeStatus: Bool { didSet { defaults.set(showClaudeStatus, forKey: Key.showClaudeStatus) } }
+    @Published var spotifyEnabled: Bool { didSet { defaults.set(spotifyEnabled, forKey: Key.spotifyEnabled) } }
+    @Published var showMusicInNotch: Bool { didSet { defaults.set(showMusicInNotch, forKey: Key.showMusicInNotch) } }
+    @Published var mirrorEnabled: Bool { didSet { defaults.set(mirrorEnabled, forKey: Key.mirrorEnabled) } }
 
     private init() {
         defaults.register(defaults: [
@@ -53,7 +57,11 @@ final class AppSettings: ObservableObject {
             Key.notificationsEnabled: true,
             Key.showOnNonNotchScreens: true,
             Key.preventCloseWhileTyping: true,
-            Key.recentDirectories: [String]()
+            Key.recentDirectories: [String](),
+            Key.showClaudeStatus: true,
+            Key.spotifyEnabled: true,
+            Key.showMusicInNotch: true,
+            Key.mirrorEnabled: true
         ])
         claudePath = defaults.string(forKey: Key.claudePath) ?? ""
         maxConcurrent = max(1, defaults.integer(forKey: Key.maxConcurrent))
@@ -69,6 +77,10 @@ final class AppSettings: ObservableObject {
         showOnNonNotchScreens = defaults.bool(forKey: Key.showOnNonNotchScreens)
         preventCloseWhileTyping = defaults.bool(forKey: Key.preventCloseWhileTyping)
         recentDirectories = defaults.stringArray(forKey: Key.recentDirectories) ?? []
+        showClaudeStatus = defaults.bool(forKey: Key.showClaudeStatus)
+        spotifyEnabled = defaults.bool(forKey: Key.spotifyEnabled)
+        showMusicInNotch = defaults.bool(forKey: Key.showMusicInNotch)
+        mirrorEnabled = defaults.bool(forKey: Key.mirrorEnabled)
     }
 
     func rememberDirectory(_ path: String) {
@@ -96,5 +108,9 @@ final class AppSettings: ObservableObject {
         static let showOnNonNotchScreens = "showOnNonNotchScreens"
         static let preventCloseWhileTyping = "preventCloseWhileTyping"
         static let recentDirectories = "recentDirectories"
+        static let showClaudeStatus = "showClaudeStatus"
+        static let spotifyEnabled = "spotifyEnabled"
+        static let showMusicInNotch = "showMusicInNotch"
+        static let mirrorEnabled = "mirrorEnabled"
     }
 }

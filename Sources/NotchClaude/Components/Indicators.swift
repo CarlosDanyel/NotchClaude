@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct ClaudeSpinner: View {
     var size: CGFloat = 14
@@ -8,7 +9,7 @@ struct ClaudeSpinner: View {
     private static let frames = ["·", "✢", "✳", "✶", "✻", "✽", "✻", "✶", "✳", "✢"]
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 0.12)) { context in
+        TimelineView(.animation(minimumInterval: 0.12, paused: !animating)) { context in
             let index = animating ? Int(context.date.timeIntervalSinceReferenceDate / 0.12) % Self.frames.count : 4
             Text(Self.frames[index])
                 .font(.system(size: size, weight: .bold))
@@ -85,5 +86,89 @@ struct ElapsedText: View {
                 .font(font)
                 .foregroundStyle(color)
         }
+    }
+}
+
+struct StatusDot: View {
+    var color: Color
+    var pulsing = false
+    var size: CGFloat = 6
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30, paused: !pulsing)) { context in
+            let phase = pulsing ? context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 1.4) / 1.4 : 1
+            Circle()
+                .fill(color)
+                .frame(width: size, height: size)
+                .background(
+                    Circle()
+                        .fill(color)
+                        .scaleEffect(1 + 1.6 * phase)
+                        .opacity(0.55 * (1 - phase))
+                )
+                .shadow(color: color.opacity(0.6), radius: 2.5)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+struct ClaudeStatusMark: View {
+    var status: NotchStatus
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ClaudeSpinner(size: 14, animating: status == .running)
+            StatusDot(color: status.color, pulsing: status == .running)
+        }
+        .help(status.label)
+        .animation(.easeOut(duration: 0.2), value: status)
+    }
+}
+
+struct EqualizerBars: View {
+    var color: Color = Theme.spotify
+    var animating = true
+    var height: CGFloat = 12
+
+    private static let speeds: [Double] = [6.1, 8.3, 5.2, 7.4]
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 20, paused: !animating)) { context in
+            let time = context.date.timeIntervalSinceReferenceDate
+            HStack(spacing: 1.5) {
+                ForEach(Self.speeds.indices, id: \.self) { index in
+                    let level = animating ? 0.3 + 0.7 * abs(sin(time * Self.speeds[index] + Double(index))) : 0.3
+                    Capsule()
+                        .fill(color)
+                        .frame(width: 2.2, height: max(2.2, height * level))
+                }
+            }
+            .frame(height: height)
+        }
+    }
+}
+
+struct ArtworkView: View {
+    var image: NSImage?
+    var size: CGFloat
+    var radius: CGFloat
+
+    var body: some View {
+        Group {
+            if let image {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else {
+                ZStack {
+                    Theme.spotify.opacity(0.16)
+                    Image(systemName: "music.note")
+                        .font(.system(size: size * 0.42, weight: .semibold))
+                        .foregroundStyle(Theme.spotify)
+                }
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
     }
 }

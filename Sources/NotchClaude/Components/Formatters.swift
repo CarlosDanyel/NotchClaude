@@ -57,6 +57,11 @@ enum Formatters {
         return "\(seconds / 3600)h\(String(format: "%02d", (seconds % 3600) / 60))"
     }
 
+    static func trackTime(_ interval: TimeInterval) -> String {
+        let seconds = max(0, Int(interval))
+        return "\(seconds / 60):\(String(format: "%02d", seconds % 60))"
+    }
+
     static func tokens(_ value: Int) -> String {
         if value >= 1_000_000 { return String(format: "%.1fM", Double(value) / 1_000_000) }
         if value >= 1_000 { return String(format: "%.1fk", Double(value) / 1_000) }

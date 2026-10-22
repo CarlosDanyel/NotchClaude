@@ -79,9 +79,23 @@ make install   # copia para /Applications e abre
 - **Passe o mouse** no notch para abrir. Ao tirar o mouse, ele fecha (com feedback tátil, igual ao NotchNook).
 - **Tarefas**: à esquerda, o que está rodando agora (ou o limite, ou a próxima tarefa); à direita, a lista com status.
 - **Nova**: cria uma tarefa.
-- No topo à direita ficam o uso do **limite de 5h** e do **limite semanal**, atualizados a cada execução.
-- Fechado, o notch mostra uma *live activity*: ✻ girando e o tempo rodando, ou o relógio de quando os tokens liberam.
+- **Mídia**: player do Spotify e espelho da câmera (veja abaixo).
+- No topo à direita ficam o uso do **limite de 5h** e do **limite semanal** em %, sempre da conta logada no
+  Claude Code: o app consulta o uso da conta a cada 2 minutos e sempre que o notch abre.
+- Fechado, o notch mostra o **logo do Claude** com uma **bolinha de status**: verde pulsando (executando),
+  âmbar (na fila), vermelha (tokens esgotados ou tarefa com erro, até você abrir o notch), azul (agendada)
+  e cinza (nada pendente). Do outro lado aparece o tempo rodando, ou o relógio de quando os tokens liberam.
 - Ao terminar, aparece um *quick peek* (“Tarefa concluída”, “Tokens esgotados”…) e uma notificação.
+
+### Spotify e câmera (aba Mídia)
+- **Spotify**: capa, música, artista, botões anterior / tocar-pausar / próxima, **volume** e **barra de progresso**
+  (arraste para avançar ou voltar na música). Com o Spotify aberto, a **capa com o equalizador** aparece do lado
+  direito do notch fechado; o equalizador se mexe enquanto a música toca.
+  Na primeira vez, o macOS pede para o NotchClaude **controlar o Spotify** (Automação). Sem essa permissão a
+  música ainda aparece, mas sem capa e sem os botões.
+- **Espelho**: clique em **Ligar câmera** para se ver antes de uma call. A câmera desliga sozinha quando você
+  sai da aba ou o notch fecha, e nada é gravado.
+- Os dois podem ser desligados em **Ajustes › Spotify** e **Ajustes › Câmera**.
 
 ### Criar uma tarefa
 1. **Pasta**: o Claude abre exatamente nessa pasta e carrega o `CLAUDE.md`, as skills (`.claude/skills`),
@@ -127,7 +141,8 @@ resumo final (duração, turnos, tokens, custo). Nessa janela você também pode
 - **Abrir no Terminal**: abre a mesma sessão no Claude interativo (`claude --resume …`).
 
 ### Atalhos por URL
-`notchclaude://open`, `notchclaude://new`, `notchclaude://new?dir=~/Projetos/site`, `notchclaude://settings`
+`notchclaude://open`, `notchclaude://new`, `notchclaude://new?dir=~/Projetos/site`, `notchclaude://settings`,
+`notchclaude://media`, `notchclaude://mirror` (abre a aba Mídia já com a câmera ligada)
 (dá para usar no Raycast, Alfred ou no app Atalhos).
 
 ---
@@ -135,7 +150,8 @@ resumo final (duração, turnos, tokens, custo). Nessa janela você também pode
 ## Ajustes
 Caminho do `claude` (detecta sozinho), pular permissões, modelo e esforço padrão, tarefas simultâneas,
 argumentos extras (ex.: `--add-dir ~/Design`), mensagem de continuação após o limite, abrir ao passar o mouse,
-feedback tátil, manter aberto enquanto digita, telas sem notch, abrir com o Mac e notificações.
+feedback tátil, manter aberto enquanto digita, telas sem notch, logo e status com o notch fechado,
+player do Spotify, capa da música no notch fechado, espelho da câmera, abrir com o Mac e notificações.
 
 ---
 
@@ -151,6 +167,9 @@ Escolha uma das opções:
 As tarefas rodam com `--dangerously-skip-permissions`: o Claude edita arquivos e executa comandos sem pedir
 confirmação, exatamente como quando você o abre assim no Terminal. Use em pastas de sua confiança.
 Isso pode ser desligado em Ajustes; nesse caso, o modo usado é `acceptEdits`.
+
+Para mostrar o uso de 5h e semanal, o app lê o login do Claude Code no Keychain (`Claude Code-credentials`) e
+consulta só `api.anthropic.com/api/oauth/usage`. O token não é salvo nem renovado pelo NotchClaude.
 
 ---
 
@@ -181,8 +200,9 @@ Sources/NotchClaude
 │   ├── Execution/     ClaudeProcess (processo + stream), RunSession, RunManager,
 │   │                  TranscriptBuilder (parser do stream-json), detecção de limite
 │   ├── Scheduling/    Scheduler (fila, horários, limite e liberação)
-│   └── Services/      ambiente do shell, anexos, skills da pasta, notificações, login
-├── Notch/         painel do notch (AppKit + SwiftUI), forma, live activity, abas
+│   └── Services/      ambiente do shell, anexos, skills da pasta, notificações, login,
+│                      Spotify (notificação + AppleScript) e câmera (AVFoundation)
+├── Notch/         painel do notch (AppKit + SwiftUI), forma, live activity, abas, mídia
 ├── Windows/       janela de acompanhamento e ajustes
 └── Components/    componentes visuais reutilizáveis
 ```

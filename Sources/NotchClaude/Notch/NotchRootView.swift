@@ -81,7 +81,9 @@ struct ClosedNotchView: View {
 
     @ViewBuilder
     private var leading: some View {
-        if model.peek != nil || model.liveActivity != nil {
+        if model.showsStatus {
+            ClaudeStatusMark(status: model.status)
+        } else if model.peek != nil || model.liveActivity != nil {
             switch model.liveActivity {
             case .running:
                 ClaudeSpinner(size: 15)
@@ -97,6 +99,16 @@ struct ClosedNotchView: View {
 
     @ViewBuilder
     private var trailing: some View {
+        if model.showsMusic {
+            NowPlayingWing()
+                .transition(.opacity.combined(with: .scale(scale: 0.6)))
+        } else {
+            activityTrailing
+        }
+    }
+
+    @ViewBuilder
+    private var activityTrailing: some View {
         switch model.liveActivity {
         case .running(let count, let startedAt, _):
             if count > 1 {
@@ -122,6 +134,18 @@ struct ClosedNotchView: View {
     }
 }
 
+struct NowPlayingWing: View {
+    @EnvironmentObject private var spotify: SpotifyController
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ArtworkView(image: spotify.artwork, size: 20, radius: 5)
+            EqualizerBars(animating: spotify.isPlaying, height: 11)
+        }
+        .help(spotify.track.map { "\($0.name) · \($0.artist)" } ?? "Spotify")
+    }
+}
+
 struct OpenNotchView: View {
     @ObservedObject var model: NotchViewModel
     let controller: NotchController
@@ -138,6 +162,9 @@ struct OpenNotchView: View {
                         .transition(.opacity.combined(with: .offset(x: -14)))
                 case .compose:
                     ComposerPage(controller: controller)
+                        .transition(.opacity.combined(with: .offset(x: 14)))
+                case .media:
+                    MediaPage()
                         .transition(.opacity.combined(with: .offset(x: 14)))
                 }
 
@@ -162,7 +189,7 @@ struct DropZoneView: View {
 
     var body: some View {
         RoundedRectangle(cornerRadius: 18, style: .continuous)
-            .fill(Color.black.opacity(0.92))
+            .fill(Color.black)
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [7, 6]))

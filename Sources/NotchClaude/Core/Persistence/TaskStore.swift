@@ -79,7 +79,17 @@ final class TaskStore: ObservableObject {
     }
 
     func updateUsage(_ snapshot: UsageSnapshot) {
-        usage = snapshot
+        var merged = snapshot
+        if merged.fiveHour == nil { merged.fiveHour = usage?.fiveHour }
+        if merged.sevenDay == nil { merged.sevenDay = usage?.sevenDay }
+        guard merged != usage else { return }
+        usage = merged
+        save()
+    }
+
+    func clearUsage() {
+        guard usage != nil else { return }
+        usage = nil
         save()
     }
 

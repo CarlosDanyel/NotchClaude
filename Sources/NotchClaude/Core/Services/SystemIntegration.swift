@@ -93,3 +93,13 @@ enum TerminalLauncher {
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
     }
 }
+
+enum PrivacyPane: String {
+    case camera = "Privacy_Camera"
+    case automation = "Privacy_Automation"
+
+    func open() {
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?\(rawValue)") else { return }
+        NSWorkspace.shared.open(url)
+    }
+}

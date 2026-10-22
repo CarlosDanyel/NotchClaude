@@ -113,3 +113,51 @@ struct AttachmentThumbnail: View {
         .onTapGesture(count: 2) { NSWorkspace.shared.open(url) }
     }
 }
+
+struct ScrubBar: View {
+    var value: Double
+    var tint: Color = .white
+    var onChanged: (Double) -> Void = { _ in }
+    var onCommit: (Double) -> Void
+
+    @State private var dragValue: Double?
+    @State private var hovering = false
+
+    private var active: Bool { hovering || dragValue != nil }
+
+    var body: some View {
+        GeometryReader { proxy in
+            let width = max(proxy.size.width, 1)
+            let shown = min(max(dragValue ?? value, 0), 1)
+            ZStack(alignment: .leading) {
+                Capsule().fill(Color.white.opacity(0.14))
+                Capsule().fill(tint).frame(width: max(3, width * shown))
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 8, height: 8)
+                    .shadow(color: .black.opacity(0.4), radius: 1.5)
+                    .offset(x: min(max(0, width * shown - 4), width - 8))
+                    .opacity(active ? 1 : 0)
+            }
+            .frame(height: active ? 4 : 3)
+            .frame(maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { gesture in
+                        let fraction = min(max(gesture.location.x / width, 0), 1)
+                        dragValue = fraction
+                        onChanged(fraction)
+                    }
+                    .onEnded { gesture in
+                        let fraction = min(max(gesture.location.x / width, 0), 1)
+                        onCommit(fraction)
+                        dragValue = nil
+                    }
+            )
+        }
+        .frame(height: 12)
+        .onHover { hovering = $0 }
+        .animation(.easeOut(duration: 0.12), value: active)
+    }
+}

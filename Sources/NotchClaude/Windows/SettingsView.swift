@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var container: AppContainer
+    @EnvironmentObject private var spotify: SpotifyController
     @State private var detectedPath: String?
     @State private var version: String?
     @State private var launchAtLogin = LaunchAtLogin.isEnabled
@@ -53,11 +54,52 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Section("Notch") {
+            Section {
                 Toggle("Abrir ao passar o mouse", isOn: $settings.openOnHover)
                 Toggle("Feedback tátil ao abrir", isOn: $settings.hapticsEnabled)
                 Toggle("Manter aberto enquanto digito", isOn: $settings.preventCloseWhileTyping)
                 Toggle("Mostrar em telas sem notch", isOn: $settings.showOnNonNotchScreens)
+                Toggle("Logo do Claude e status com o notch fechado", isOn: $settings.showClaudeStatus)
+            } header: {
+                Text("Notch")
+            } footer: {
+                Text("Bolinha de status: verde executando · âmbar na fila · vermelha tokens esgotados ou tarefa com erro · azul agendada · cinza nada pendente.")
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                Toggle("Player do Spotify na aba Mídia", isOn: $settings.spotifyEnabled)
+                Toggle("Capa da música com o notch fechado", isOn: $settings.showMusicInNotch)
+                    .disabled(!settings.spotifyEnabled)
+                LabeledContent("Status") {
+                    Text(spotifyStatus)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                if settings.spotifyEnabled, spotify.automationDenied {
+                    HStack {
+                        Text("Sem permissão para controlar o Spotify")
+                            .font(.caption)
+                            .foregroundStyle(Theme.warning)
+                        Spacer()
+                        Button("Abrir Automação") { PrivacyPane.automation.open() }
+                            .controlSize(.small)
+                    }
+                }
+            } header: {
+                Text("Spotify")
+            } footer: {
+                Text("Na primeira vez, o macOS pede para o NotchClaude controlar o Spotify. Sem essa permissão a música aparece, mas sem a capa e sem os botões.")
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                Toggle("Espelho da câmera na aba Mídia", isOn: $settings.mirrorEnabled)
+            } header: {
+                Text("Câmera")
+            } footer: {
+                Text("A câmera só liga quando você clica em Ligar câmera e desliga sozinha quando o notch fecha. Nada é gravado.")
+                    .foregroundStyle(.secondary)
             }
 
             Section("Sistema") {
@@ -88,6 +130,14 @@ struct SettingsView: View {
         .padding(.top, 22)
         .onAppear(perform: detect)
         .onChange(of: settings.claudePath) { detect() }
+    }
+
+    private var spotifyStatus: String {
+        guard settings.spotifyEnabled else { return "Desativado" }
+        guard spotify.isInstalled else { return "Spotify não instalado" }
+        guard spotify.isRunning else { return "Spotify fechado" }
+        guard let track = spotify.track else { return "Nada tocando" }
+        return "\(spotify.isPlaying ? "Tocando" : "Pausado"): \(track.name) · \(track.artist)"
     }
 
     private var statusLine: String {

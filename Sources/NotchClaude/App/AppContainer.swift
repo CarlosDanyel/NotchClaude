@@ -9,7 +9,10 @@ final class AppContainer: ObservableObject {
     let runs: RunManager
     let scheduler: Scheduler
     let composer: ComposerModel
+    let usageMonitor: UsageMonitor
     let notifier = Notifier()
+    let spotify = SpotifyController()
+    let mirror = CameraMirror()
     lazy var router = WindowRouter(container: self)
     lazy var notch = NotchController(container: self)
 
@@ -18,6 +21,7 @@ final class AppContainer: ObservableObject {
         runs = RunManager(store: store, settings: settings, shell: shell)
         scheduler = Scheduler(store: store, runs: runs, settings: settings)
         composer = ComposerModel(settings: settings)
+        usageMonitor = UsageMonitor(store: store)
     }
 
     func start() {
@@ -27,12 +31,14 @@ final class AppContainer: ObservableObject {
         notifier.onOpenTask = { [weak self] id in self?.router.showMonitor(id) }
         notifier.activate()
         notch.install()
+        usageMonitor.start()
         shell.refresh { [weak self] in self?.scheduler.start() }
         LaunchAtLogin.synchronize()
     }
 
     func shutdown() {
         runs.stopAll()
+        mirror.stop()
     }
 
     func submitComposer() -> Bool {
@@ -56,6 +62,11 @@ final class AppContainer: ObservableObject {
             if let argument, let id = UUID(uuidString: argument) { router.showMonitor(id) }
         case "settings":
             router.showSettings()
+        case "media":
+            notch.open(page: .media)
+        case "mirror":
+            notch.open(page: .media)
+            mirror.start()
         default:
             notch.open(page: .tasks)
         }

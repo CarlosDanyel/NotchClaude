@@ -44,6 +44,7 @@ final class WindowRouter: NSObject, NSWindowDelegate {
         let view = SettingsView()
             .environmentObject(container)
             .environmentObject(container.settings)
+            .environmentObject(container.spotify)
         let window = makeWindow(size: NSSize(width: 560, height: 640), title: "Ajustes do NotchClaude", content: view)
         window.styleMask.remove(.resizable)
         settingsWindow = window
