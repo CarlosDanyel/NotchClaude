@@ -23,7 +23,19 @@ O app funciona melhor em Macs com notch, mas também aparece no topo central de 
 
 ## Instalação (pelo instalador)
 
-1. Abra o arquivo **`dist/NotchClaude-1.0.0.dmg`**.
+### 📦 Onde está o instalador
+
+O instalador pronto fica na pasta **`dist/`** deste projeto:
+
+**➡️ [`dist/NotchClaude-1.0.0.dmg`](dist/NotchClaude-1.0.0.dmg)**
+
+- No GitHub: abra o arquivo acima e clique em **Download** (ou em *View raw*).
+- No seu Mac: `PROJETOS/NotchClaude/dist/NotchClaude-1.0.0.dmg`, ou rode `open dist` na pasta do projeto.
+- Para gerar de novo: `make dmg` (o arquivo é recriado em `dist/`).
+
+### Passo a passo
+
+1. Abra o arquivo **`NotchClaude-1.0.0.dmg`**.
 2. Arraste **NotchClaude** para a pasta **Aplicativos**.
 3. Abra o NotchClaude pela pasta Aplicativos (ou pelo Spotlight).
 4. Permita as **notificações** quando o macOS perguntar.
